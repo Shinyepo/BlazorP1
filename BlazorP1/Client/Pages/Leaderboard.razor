@@ -1,0 +1,94 @@
+﻿@page "/leaderboard"
+@inject ILeaderboardService LeaderboardService
+@inject AuthenticationStateProvider StateProvider
+@inject IBattleService BattleService
+@inject IBananaService BananaService
+@inject IToastService ToastService
+@inject NavigationManager NavManager
+
+@attribute [Authorize]
+
+<h3>Leaderboard</h3>
+
+@if (LeaderboardService.Leaderboard != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Battles</th>
+                <th>Wins</th>
+                <th class="d-none d-sm-table-cell">Defeats</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in LeaderboardService.Leaderboard)
+            {
+
+                <tr style="@getMyStyle(item.UserId)">
+                    <td>@item.Rank</td>
+                    <td>@item.Username</td>
+                    <td>@item.Battles</td>
+                    <td>@item.Wins</td>
+                    <td class="d-none d-sm-table-cell">@item.Defeats</td>
+                    <td>
+                        @if (item.UserId != LeaderboardService.MyUserId)
+                        {
+                            <button type="button" @onclick="() => StartBattle(item.UserId)" class="btn btn-primary">Fight</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <span>Loading leaderboard...</span>
+}
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {   
+        
+        await LeaderboardService.GetLeaderboard();        
+    }
+
+    public async Task StartBattle(int opponentId)
+    {
+        var result = await BattleService.StartBattle(opponentId);
+        
+        if (result.RoundsFought <= 0)
+        {
+            ToastService.ShowInfo("This user is not ready for battle!");
+        }
+        else if (result.IsVictory)
+        {
+            ToastService.ShowSuccess("You won the battle!");
+        }
+        else
+        {
+            ToastService.ShowError("You lost the battle!");
+        }
+        await BananaService.GetBananas();
+        await LeaderboardService.GetLeaderboard();
+
+        if (result.RoundsFought > 0) NavManager.NavigateTo("battlelog");
+    }
+
+    public string getMyStyle(int id)
+    {
+        if (LeaderboardService.MyUserId == id)
+        {
+            return "color:green; font-weight: 600";
+
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+}

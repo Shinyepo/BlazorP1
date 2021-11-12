@@ -1,0 +1,121 @@
+﻿@page "/Army"
+@inject IUnitService UnitService
+@inject IBattleService BattleService
+@attribute [Authorize]
+
+
+<h1>Your Army</h1>
+
+@if (UnitService.Units.Count() > 0)
+{
+    @if (UCount != 0) ResetCounters();
+    <h3>Summary</h3>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-md-5 p-0">
+                <table class="table table-sm text-center">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Count</th>
+                            <th>Healthy</th>
+                            <th>Injured</th>
+                            <th>Dead</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in UnitService.Units.OrderBy(x=>x.Title))
+                        {
+                            var Unit = UnitService.MyUnits.Where(x => x.UnitId == item.Id).ToList();
+                            var UnitsCount = Unit.Count();
+                            var UnitsReadyCount = Unit.Where(x => x.HitPoints == 100).Count();
+                            var UnitsDeadCount = Unit.Where(x => x.HitPoints <= 0).Count();
+                            var UnitsInjuredCount = Unit.Where(x => x.HitPoints > 0 && x.HitPoints < 100).Count();
+                            UCount += UnitsCount;
+                            UDCount += UnitsDeadCount;
+                            URCount += UnitsReadyCount;
+                            UICount += UnitsInjuredCount;
+                            <tr>
+                                <td><img src="icons/@(item.Title).png" alt="Units Emblem" /></td>
+                                <td>@UnitsCount</td>
+                                <td>@UnitsReadyCount</td>
+                                <td>@UnitsInjuredCount</td>
+                                <td>@UnitsDeadCount</td>
+                            </tr>
+                        }                        
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-weight-bold table-secondary">
+                            <td>Summary</td>
+                            <td>@UCount</td>
+                            <td class="text-success">@URCount</td>
+                            <td class="text-warning">@UICount</td>
+                            <td class="text-danger">@UDCount</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <button class="btn btn-success" @onclick="ReviveArmy"><span class="oi oi-plus"></span>&nbsp;Heal Army</button>
+            </div>
+        </div>
+
+    </div>
+
+
+    <h3 class="mt-4">Detailed list of Units</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th class="d-none d-sm-table-cell">Name</th>
+                <th>HP</th>
+                <th>Attack</th>
+                <th>Defence</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in UnitService.MyUnits)
+            {
+                <tr>
+                    <td><img src="icons/@(item.Unit.Title).png" alt="Units Emblem" /></td>
+                    <td class="d-none d-sm-table-cell">@item.Unit.Title</td>
+                    <td>@item.HitPoints</td>
+                    <td>@item.Unit.Attack</td>
+                    <td>@item.Unit.Defence</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <span>Loading units...</span>
+}
+
+@code {
+    public int UCount = 0;
+    public int URCount = 0;
+    public int UDCount = 0;
+    public int UICount = 0;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UnitService.LoadUnitsAsync();
+        await UnitService.LoadUserUnitsAsync();
+        await BattleService.LastLoginUpdate();
+    }
+    private async Task ReviveArmy()
+    {
+        await UnitService.ReviveArmy();
+        await UnitService.LoadUnitsAsync();
+        await UnitService.LoadUserUnitsAsync();
+
+    }
+
+    public void ResetCounters() {
+        UCount = 0;
+        URCount = 0;
+        UDCount = 0;
+        UICount = 0;
+    }
+}

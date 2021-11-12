@@ -1,0 +1,41 @@
+﻿@inject IBattleService BattleService
+@inject AuthenticationStateProvider StateProvider
+
+@if (BattleService.SinceLastLogin > 0)
+{
+    <div class="card border-danger mb-3 h-100">
+        <div class="card-header">Army Raport</div>
+        <div class="card-body text-danger d-flex flex-column">
+            <h5 class="card-title">We were attacked!</h5>
+            <p class="card-text">We were attacked while you were away! Our army is exhausted and needs medical treatment!</p>
+            <p class="text-small text-muted">Visit your army or battle history to dismiss this message.</p>
+            <div class="flex-grow-1 d-flex align-items-end justify-content-between">
+                <a href="history" class="btn btn-secondary">History</a>
+                <a href="army" class="btn btn-primary">Army</a>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card border-info mb-3 h-100">
+        <div class="card-header">Army Raport</div>
+        <div class="card-body text-info d-flex flex-column">
+            <h5 class="card-title">Standby</h5>
+            <p class="card-text">No one dared to attack us!</p>
+            <div class="flex-grow-1 d-flex align-items-end justify-content-between">
+                <a href="history" class="btn btn-secondary">History</a>
+                <a href="army" class="btn btn-primary">Army</a>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await BattleService.GetLastHistory();
+    }
+    
+}

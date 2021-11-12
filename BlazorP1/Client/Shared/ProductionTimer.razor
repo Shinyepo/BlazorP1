@@ -1,0 +1,87 @@
+﻿@inject IBuildingService BuildingService
+@using System.Timers;
+@implements IDisposable
+
+<button class="btb form-control btn-info mb-1" @onclick="() => CollectBananas(Config.Id, StaticDetails.ProductionBuilding)">Collect @Text</button>
+
+
+@code {
+    [Parameter]
+    public UserBuilding UserBuildings { get; set; }
+    [Parameter]
+    public ProductionBuilding Config { get; set; }
+
+    public string Text { get; set; }
+    public int Untill { get; set; }
+    public int MaxBananas { get; set; }
+    public UserBuildingTask BuildingTask { get; set; }
+
+    public Timer Timer { get; set; } = new Timer() { Interval = 1000 };
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetTask();
+        await GetMaxBananas();
+
+        if (BuildingTask.TaskEndTime > DateTime.Now && UserBuildings.isFinished)
+        {
+            Untill = Convert.ToInt32(BuildingTask.TaskEndTime.Subtract(DateTime.Now).TotalSeconds);
+            StartCountdown();
+        }
+        else
+        {
+            Text = MaxBananas.ToString();
+        }
+    }
+    public async Task CancelBuilding(int Id, string Type)
+    {
+
+        await BuildingService.CancelBuilding(Id, Type);
+        StateHasChanged();
+    }
+
+    public void StartCountdown()
+    {
+        Timer.Elapsed += (obj, args) =>
+        {
+            if (Untill < 0)
+            {
+                Timer.Stop();
+            }
+            else
+            {
+                Untill--;
+                var TaskTime = Config.TaskTimeBase + (Config.TaskTimeStep * UserBuildings.BuildingLevel);
+                var MinutesPassed = DateTime.Now.Subtract(BuildingTask.LastTaskEndTime).TotalMinutes;
+                var maxTime = Config.TaskTimeBase + (Config.TaskTimeStep * UserBuildings.BuildingLevel);
+                var maxBananas = Config.BananaCountBase + (Config.BananaCountStep * UserBuildings.BuildingLevel);
+                var Percent = MinutesPassed / maxTime;
+                var Amount = Convert.ToInt32(Math.Floor(maxBananas * Percent));
+                Console.WriteLine("Amount " + Amount);
+                StateHasChanged();
+            }
+        };
+        Timer.Start();
+    }
+
+    public void Dispose()
+    {
+        Timer.Dispose();
+    }
+
+    public async Task GetMaxBananas()
+    {
+        MaxBananas = await BuildingService.GetMaxBananas(UserBuildings.BuildingId, UserBuildings.BuildingLevel);
+    }
+    public async Task GetTask()
+    {
+        BuildingTask = await BuildingService.GetTask(UserBuildings.Id);
+    }
+    public async Task CollectBananas(int BuildingId, string Type)
+    {
+        await BuildingService.EndTask(BuildingId, Type);
+        StateHasChanged();
+
+    }
+}

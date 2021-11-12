@@ -1,0 +1,35 @@
+﻿@inject IBuildingService BuildingService
+@if (Count > 0)
+{
+    <div class="card border-success mb-3 h-100">
+        <div class="card-header">Workers Raport</div>
+        <div class="card-body text-success d-flex flex-column">
+            <h5 class="card-title">Finished!</h5>
+            <p class="card-text">Buildings are ready to be finished!</p>
+            <div class="flex-grow-1 d-flex align-items-end justify-content-end">
+                <a href="build" class="btn btn-primary">Build</a>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card border-info mb-3 h-100">
+        <div class="card-header">Workers Raport</div>
+        <div class="card-body text-info d-flex flex-column">
+            <h5 class="card-title">Standby</h5>
+            <p class="card-text">Our workers are ready for work!</p>
+            <div class="flex-grow-1 d-flex align-items-end justify-content-end">
+                <a href="build" class="btn btn-primary">Build</a>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    int Count;
+    protected override async Task OnInitializedAsync()
+    {
+        Count = await BuildingService.GetReadyBuildings();
+    }
+}

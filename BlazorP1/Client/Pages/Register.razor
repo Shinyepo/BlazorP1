@@ -1,0 +1,87 @@
+﻿@page "/Register"
+@inject IUnitService UnitService
+@inject NavigationManager NvManager
+@inject IAuthService AuthService
+@inject IToastService Toast
+<div class="justify-content-center">
+    <h1 class="text-center">Register</h1>
+    <div class="container">
+        <div class="row justify-content-center">
+            <EditForm Model="User" OnValidSubmit="HandleRegister" class="col-lg-5 col-md-7 col-12 border rounded">
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+                <div class="form-group mt-3 row">
+                    <div class="col-12">
+                        <label for="Email" class="required m-0">Email</label>
+                        <InputText id="Email" @bind-Value="User.Email" class="login-input"></InputText>
+                        <ValidationMessage For="@(() => User.Email)" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-12">
+                        <label for="Username" class="required m-0">Username</label>
+                        <InputText id="Username" @bind-Value="User.Username" class="login-input"></InputText>
+                        <ValidationMessage For="@(() => User.Username)" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-12">
+                        <label for="Password" class="required m-0">Password</label>
+                        <InputText id="Password" @bind-Value="User.Password" class="login-input" type="password"></InputText>
+                        <ValidationMessage For="@(() => User.Password)" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-12">
+                        <label for="ConfirmPassword" class="required m-0">Confirm Password</label>
+                        <InputText id="ConfirmPassword" @bind-Value="User.ConfirmPassword" class="login-input" type="password"></InputText>
+                        <ValidationMessage For="@(() => User.ConfirmPassword)" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-12">
+                        <label for="StartUnit">Start Unit</label><br />
+                        <InputRadioGroup id="StartUnit" @bind-Value="User.StartUnitId" class="login-input">
+                            @foreach (var unit in UnitService.Units)
+                            {
+                                <InputRadio Value="@unit.Id" /><span class="pl-3">@unit.Title</span><br />
+                            }
+                        </InputRadioGroup>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-12">
+                        <button type="submit" class="form-control btn btn-primary">Register</button>
+                    </div>
+                </div>
+                <div class="form-group mt-2">
+                    <a href="" class="form-label">Go Back</a>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private UserRegister User = new UserRegister();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UnitService.LoadUnitsAsync();
+    }
+
+    async void HandleRegister()
+    {
+        var result = await AuthService.Register(User);
+        if (result.Success)
+        {
+            Toast.ShowSuccess(result.Message);
+            NvManager.NavigateTo("/");
+
+        }
+        else
+        {
+            Toast.ShowError(result.Message);
+        }
+    }
+}

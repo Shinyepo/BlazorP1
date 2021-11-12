@@ -1,0 +1,401 @@
+﻿@page "/Build"
+@inject IBananaService BananaService
+@inject IUnitService UnitService
+@inject IToastService ToastService
+@inject IBuildingService BuildingService
+@inject AuthenticationStateProvider AuthProvider
+@implements IDisposable
+@attribute [Authorize]
+
+@*<div class="form-group">
+    <select @bind="SelectedUnitId" class="form-control">
+    @foreach (var unit in UnitService.Units)
+    {
+    <option value="@unit.Id">@unit.Title // @unit.BananaCost Bananas</option>
+    }
+    </select>
+    </div>
+
+    <button class="btn btn-primary" @onclick="BuildUnit">Eat Bananas</button>*@
+
+
+@if (BuildingService.UnitBuildings != null)
+{
+    <div class="container-fluid p-0">
+        <h2>Army buildings</h2>
+        @foreach (var item in BuildingService.UnitBuildings.OrderBy(x => x.BuildingName))
+        {
+            var users = BuildingService.UserBuildings.FirstOrDefault(x => x.BuildingId == item.Id && x.BuildingType == "Unit");
+            var level = 0;
+            @if (users != null)
+            {
+                level = users.BuildingLevel;
+            }
+            var cost = item.BananaCostBase + (item.BananaCostStep * level);
+            <div class="col-12">
+                <div class="row position-relative mt-2 mb-2">
+                    <div class="col-12 border rounded">
+                        @if (users == null || users.isFinished == true)
+                        {
+                            <div class="row p-1">
+                                <div class="col-2 col-lg-1 mx-0 mx-md-auto my-auto" style="">
+                                    @if (item.BuildingName == "Mage Tower")
+                                    {
+                                        <img src="icons/mage.png" class="d-block" style="margin:auto;" />
+                                    }
+                                    else if (item.BuildingName == "Barracks")
+                                    {
+                                        <img src="icons/knight.png" class="d-block" style="margin:auto;" />
+
+                                    }
+                                    else if (item.BuildingName == "Archers Guild")
+                                    {
+                                        <img src="icons/archer.png" class="d-block" style="margin:auto;" />
+
+                                    }
+                                    else if (item.BuildingName == "Campfire")
+                                    {
+                                        <img src="icons/barbarian.png" class="d-block" style="margin:auto;" />
+
+                                    }
+                                </div>
+                                <div class="col-10 col-lg-9 p-0">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <span>@item.BuildingName</span>
+                                        </div>
+                                        <div class="col-4">
+                                            <span>Unit limit: @(item.UnitLimitBase+(item.UnitLimitStep*level))</span>
+                                        </div>
+                                        <div class="col-4">
+                                            Build cost:
+                                            @if (level == item.MaxLevel)
+                                            {
+                                                <span>Already Max Level</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@cost Bananas</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <span>Building Level: @level</span>
+                                        </div>
+                                        <div class="col-4">
+                                            Next level:
+                                            @if (level == item.MaxLevel)
+                                            {
+                                                <span>Already Max Level</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@(item.UnitLimitBase+(item.UnitLimitStep*(level+1)))</span>
+                                            }
+                                        </div>
+                                        <div class="col-4">
+                                            Time:
+                                            @if (level == item.MaxLevel)
+                                            {
+                                                <span>Already Max Level</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@(TimeSpan.FromMinutes(item.BuildTimeBase+(item.BuildTimeStep*level)))</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-8 col-lg-2 px-1" style="margin:auto;">
+                                    <button class="btn btn-info form-control mb-1" @onclick="() => BuildUnit(item.UnitId)"><span class="oi oi-person"></span>&nbsp;Recruit</button>
+                                    @if (level > 0 && level < item.MaxLevel)
+                                    {
+                                        <button class="btn form-control btn-success" @onclick="() => StartBuilding(item.Id, StaticDetails.UnitBuilding, cost)"><span class="oi oi-arrow-thick-top"></span>&nbsp;Build</button>
+                                    }
+                                    else if (level < 1)
+                                    {
+                                        <button class="btn form-control btn-primary" @onclick="() => StartBuilding(item.Id, StaticDetails.UnitBuilding, cost)"><span class="oi oi-wrench"></span>&nbsp;Build</button>
+                                    }
+                                    else if (level == item.MaxLevel)
+                                    {
+                                        <button disabled class="btn form-control btn-secondary">Max Level</button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        else if (users != null && users.isFinished == false)
+                        {
+                            var fulltime = (item.BuildTimeBase + (item.BuildTimeStep * level)) * 60;
+                            <div class="row p-1">
+                                <div class="col-2 col-md-1 mx-0 mx-md-auto my-auto" style="margin:auto;">
+                                    @if (item.BuildingName == "Mage Tower")
+                                    {
+                                        <img src="icons/mage.png" class="d-block" style="margin:auto;" />
+                                    }
+                                    else if (item.BuildingName == "Barracks")
+                                    {
+                                        <img src="icons/knight.png" class="d-block" style="margin:auto;" />
+
+                                    }
+                                    else if (item.BuildingName == "Archers Guild")
+                                    {
+                                        <img src="icons/archer.png" class="d-block" style="margin:auto;" />
+
+                                    }
+                                    else if (item.BuildingName == "Campfire")
+                                    {
+                                        <img src="icons/barbarian.png" class="d-block" style="margin:auto;" />
+
+                                    }
+                                </div>
+                                <BuildingOverlay BuildingName="@item.BuildingName" UserBuildings="users" BuildingTime="@fulltime" />
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="container-fluid p-0 mt-2">
+        <h2>Production buildings</h2>
+        @foreach (var item in BuildingService.ProductionBuildings)
+        {
+            var users = BuildingService.UserBuildings.FirstOrDefault(x => x.BuildingId == item.Id && x.BuildingType == "Production");
+            var level = 0;
+            @if (users != null)
+            {
+                level = users.BuildingLevel;
+            }
+            var cost = item.BananaCostBase + (item.BananaCostStep * level);
+            <div class="col-12">
+                <div class="row position-relative mt-2 mb-2">
+                    <div class="col-12 border rounded">
+                        @if (users == null || users.isFinished == true)
+                        {
+                            <div class="row p-1">
+                                <div class="col-2 col-md-1 mx-0 mx-md-auto my-auto" style="margin:auto;">
+                                    <img src="icons/banana.png" class="d-block" style="margin:auto;" />
+                                </div>
+                                <div class="col-9 p-0">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <span>@item.BuildingName</span>
+                                        </div>
+                                        <div class="col-4">
+                                            <span>@(item.BananaCountBase+(item.BananaCountStep*level)) Bananas/h</span>
+                                        </div>
+                                        <div class="col-4">
+                                            Build cost:
+                                            @if (level == item.MaxLevel)
+                                            {
+                                                <span>Already Max Level</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@cost Bananas</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <span>Building Level: @level</span>
+                                        </div>
+                                        <div class="col-4">
+                                            Next level:
+                                            @if (level == item.MaxLevel)
+                                            {
+                                                <span>Already Max Level</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@(item.BananaCountBase+(item.BananaCountStep*(level+1)))</span>
+                                            }
+                                        </div>
+                                        <div class="col-4">
+                                            Time:
+                                            @if (level == item.MaxLevel)
+                                            {
+                                                <span>Already Max Level</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@(TimeSpan.FromMinutes(item.BuildTimeBase+(item.BuildTimeStep*level)))</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-8 col-lg-2 px-1" style="margin:auto;">
+                                    @if (level > 0 && level < item.MaxLevel)
+                                    {
+                                        <ProductionTimer Config="item" UserBuildings="users" />
+                                        <button class="btn form-control btn-success" @onclick="() => StartBuilding(item.Id, StaticDetails.ProductionBuilding, cost)"><span class="oi oi-arrow-thick-top"></span>&nbsp;Upgrade</button>
+                                    }
+                                    else if (level < 1)
+                                    {
+                                        <button class="btn form-control btn-primary" @onclick="() => StartBuilding(item.Id, StaticDetails.ProductionBuilding, cost)"><span class="oi oi-wrench"></span>&nbsp;Build</button>
+                                    }
+                                    else if (level == item.MaxLevel)
+                                    {
+                                        <ProductionTimer Config="item" UserBuildings="users" />
+                                        <button disabled class="btn form-control btn-secondary">Max Level</button>
+                                    }
+                                </div>
+                            </div>
+
+                        }
+                        else if (users != null && users.isFinished == false)
+                        {
+                            var fulltime = (item.BuildTimeBase + (item.BuildTimeStep * level)) * 60;
+                            <div class="row p-1">
+                                <div class="col-2 col-md-1 mx-0 mx-md-auto my-auto" style="margin:auto;">
+                                    <img src="icons/banana.png" class="d-block" style="margin:auto;" />
+                                </div>
+                                <BuildingOverlay BuildingName="@item.BuildingName" UserBuildings="users" BuildingTime="@fulltime" />
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="container-fluid p-0 mt-2">
+        <h2>Utility buildings</h2>
+        @foreach (var item in BuildingService.UtilityBuildings)
+        {
+            var users = BuildingService.UserBuildings.FirstOrDefault(x => x.BuildingId == item.Id && x.BuildingType == "Utility");
+            var level = 0;
+            @if (users != null)
+            {
+                level = users.BuildingLevel;
+            }
+            var cost = item.BananaCostBase + (item.BananaCostStep * level);
+            <div class="col-12">
+                <div class="row position-relative mt-2 mb-2">
+                    <div class="col-12 border rounded">
+                        @if (users == null || users.isFinished == true)
+                        {
+                            <div class="row p-1">
+                                <div class="col-2 col-md-1 mx-0 mx-md-auto my-auto" style="margin:auto;">
+                                    <img src="icons/banana.png" class="d-block" style="margin:auto;" />
+                                </div>
+                                <div class="col-9 p-0">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <span>@item.BuildingName</span>
+                                        </div>
+                                        <div class="col-4">
+                                            <span>@item.BuildingDescription -@(item.BonusAmountBase+(item.BonusAmountStep*level))%</span>
+                                        </div>
+                                        <div class="col-4">
+                                            Build cost:
+                                            @if (level == item.MaxLevel)
+                                            {
+                                                <span>Already Max Level</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@cost Bananas</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <span>Building Level: @level</span>
+                                        </div>
+                                        <div class="col-4">
+                                            Next level
+                                            @if (level == item.MaxLevel)
+                                            {
+                                                <span>Already Max Level</span>
+                                            }
+                                            else
+                                            {
+                                                <span>-@(item.BonusAmountBase+(item.BonusAmountStep*(level+1)))%</span>
+                                            }
+                                        </div>
+                                        <div class="col-4">
+                                            Time:
+                                            @if (level == item.MaxLevel)
+                                            {
+                                                <span>Already Max Level</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@(TimeSpan.FromMinutes(item.BuildTimeBase+(item.BuildTimeStep*level)))</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-8 col-lg-2 px-1" style="margin:auto;">
+                                    @if (level > 0 && level < item.MaxLevel)
+                                    {
+                                        <button class="btn form-control btn-success" @onclick="() => StartBuilding(item.Id, StaticDetails.UtilityBuilding, cost)"><span class="oi oi-arrow-thick-top"></span>&nbsp;Upgrade</button>
+                                    }
+                                    else if (level < 1)
+                                    {
+                                        <button class="btn form-control btn-primary" @onclick="() => StartBuilding(item.Id, StaticDetails.UtilityBuilding, cost)"><span class="oi oi-wrench"></span>&nbsp;Build</button>
+                                    }
+                                    else if (level == item.MaxLevel)
+                                    {
+                                        <button disabled class="btn form-control btn-secondary">Max Level</button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        else if (users != null && users.isFinished == false)
+                        {
+                            var fulltime = (item.BuildTimeBase + (item.BuildTimeStep * level)) * 60;
+                            <div class="row p-1">
+                                <div class="col-2 col-md-1 mx-0 mx-md-auto my-auto" style="margin:auto;">
+                                    <img src="icons/banana.png" class="d-block" style="margin:auto;" />
+                                </div>
+                                <BuildingOverlay BuildingName="@item.BuildingName" UserBuildings="users" BuildingTime="@fulltime" />
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        }
+    </div>
+}
+
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UnitService.LoadUnitsAsync();
+        await BuildingService.GetBuildings();
+        BuildingService.OnChange += StateHasChanged;
+    }
+
+    public async Task StartBuilding(int Id, string type, int cost)
+    {
+        if (BananaService.Bananas < cost)
+        {
+            ToastService.ShowError("You dont have enough bananas!");
+        }
+        else
+        {
+            await BuildingService.StartBuilding(Id, type);
+            StateHasChanged();
+        }
+    }
+
+    
+
+    public void Dispose()
+    {
+        BuildingService.OnChange -= StateHasChanged;
+    }
+
+    public async Task BuildUnit(int UnitId)
+    {
+        await UnitService.AddUnit(UnitId);
+    }
+}

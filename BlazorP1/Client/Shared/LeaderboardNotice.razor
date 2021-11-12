@@ -1,0 +1,36 @@
+﻿@inject ILeaderboardService LeaderboardService
+
+<div class="card border-info mb-3 h-100">
+    <div class="card-header">Leaderboard Raport</div>
+    <div class="card-body text-info d-flex flex-column">
+        <h5 class="card-title">Your ranking</h5>
+        <p class="card-text">You are @MyRank! Keep fighting with other players to hold your position or to climb higher!</p>
+        <div class="flex-grow-1 d-flex align-items-end justify-content-between">
+            <a href="leaderboard" class="btn btn-primary">Army</a>
+            <a href="leaderboard" class="btn btn-primary">Leaderboard</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    string MyRank;
+    protected override async Task OnInitializedAsync()
+    {
+        var rank = await LeaderboardService.GetMyRank();
+        if (rank == 1)
+        {
+            MyRank = rank + "st";
+        } else if (rank == 2)
+        {
+            MyRank = rank + "nd";
+
+        } else if (rank == 3)
+        {
+            MyRank = rank + "rd";
+        } else
+        {
+            MyRank = rank + "th";
+        }
+    }
+}
+

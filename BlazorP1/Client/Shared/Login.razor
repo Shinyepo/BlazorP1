@@ -1,0 +1,63 @@
+﻿@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuthService AuthService
+@inject IToastService Toast
+
+
+
+<div class="justify-content-center">
+    <img src="icons/gorilla.png" class="img-fluid d-md-block d-none" style="margin: auto;" />
+    <h1 class="text-center">Monkey Fights!</h1>
+    <h6 class="text-center">Build your own army of Monkeys and send them to WAR!</h6>
+    <div class="container">
+        <div class="row justify-content-center">
+            <EditForm Model="User" OnValidSubmit="HandleLogin" class="col-lg-5 col-md-7 col-12 border rounded">
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+                <div class="form-group mt-3 row">
+                    <div class="col-12">
+                        <label for="Email" class="m-0">Email</label>
+                        <InputText id="Email" @bind-Value="User.Email" class="login-input"></InputText>
+                        <ValidationMessage For="@(() => User.Email)" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-12">
+                        <label for="Password" class="m-0">Password</label>
+                        <InputText id="Password" @bind-Value="User.Password" class="login-input" type="password"></InputText>
+                        <ValidationMessage For="@(() => User.Password)" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="form-control btn btn-primary">Login</button>
+                    </div>
+                </div>
+                <div class="form-group mt-2 d-flex justify-content-between">
+                    <a href="#" class="form-label">Forgot Password?</a>
+                    <a href="register" class="form-label">Create an Account</a>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+
+    private UserLogin User = new UserLogin();
+
+    private async void HandleLogin()
+    {
+        var result = await AuthService.Login(User);
+        if (result.Success)
+        {
+            await LocalStorage.SetItemAsync<string>("authToken", result.Data);
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        }
+        else
+        {
+            Toast.ShowError(result.Message);
+        }
+    }
+}

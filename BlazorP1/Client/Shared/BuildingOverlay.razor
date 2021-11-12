@@ -1,0 +1,140 @@
+﻿@inject IBuildingService BuildingService
+@using System.Timers;
+@implements IDisposable
+
+@*<div class="col h-100 position-absolute rounded border bg-dark @(UserBuildings.isFinished? "d-none" : "d-inline-block")">
+    <div class="row h-100 text-center">
+    @if (UserBuildings.BuildFinishTime > DateTime.Now)
+    {
+
+    <div class="col-12">
+    @Text
+    </div>
+    <div class="col-12">
+    <div class="col-8 d-inline-block" style="margin:auto;">
+    <div class="progress">
+    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="@ProgressValue" aria-valuemin="0" aria-valuemax="100" style="width: @(ProgressValue)%"></div>
+    </div>
+    </div>
+    </div>
+    }
+    else
+    {
+    <div class="col-3" style="margin:auto;">
+    <div class="">
+    <button class="btn btn-success form-control" @onclick="() => FinishBuilding(ItemId, BuildingType)">Finish building</button>
+    </div>
+    </div>
+    }
+    </div>
+    </div>*@
+<div class="col-10 col-lg-9 p-2">
+    <div class="row">
+        <div class="col-4">
+            <span>@BuildingName</span>
+        </div>
+        <div class="col-4">
+            <span>Level @UserBuildings.BuildingLevel &gt; <b>@(UserBuildings.BuildingLevel+1)</b></span>
+        </div>
+        <div class="col-4">
+            Time: @Text
+        </div>
+    </div>
+    <div class="row">
+        <div style="" class="col-12 m-auto">
+            <div class="progress">
+                <span class="position-absolute font-weight-bold" style="left: 50%;">@ProgressValue%</span>
+                <div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" aria-valuenow="@ProgressValue" aria-valuemin="0" aria-valuemax="100" style="width: @ProgressValue%"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="col-8 col-lg-2 px-1" style="margin:auto;">
+    @if (Untill > 0)
+    {
+        <button class="btn btn-danger form-control" @onclick="() => CancelBuilding(UserBuildings.BuildingId, UserBuildings.BuildingType)"><span class="oi oi-circle-x"></span>&nbsp;Cancel</button>
+
+    }
+    else
+    {
+        <button class="btn btn-success form-control" @onclick="() => FinishBuilding(UserBuildings.BuildingId, UserBuildings.BuildingType)"><span class="oi oi-task"></span>&nbsp;Finish</button>
+
+    }
+</div>
+
+@code {
+    [Parameter]
+    public UserBuilding UserBuildings { get; set; }
+    [Parameter]
+    public int BuildingTime { get; set; }
+    [Parameter]
+    public string BuildingName { get; set; }
+
+
+    public int ProgressValue { get; set; } = 0;
+    public string Text { get; set; }
+    public int Untill { get; set; }
+
+    public Timer Timer { get; set; } = new Timer() { Interval = 1000 };
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserBuildings.BuildFinishTime > DateTime.Now)
+        {
+            Untill = Convert.ToInt32(UserBuildings.BuildFinishTime.Subtract(DateTime.Now).TotalSeconds);
+            StartCountdown();
+        } else
+        {
+            Text = "00:00:00";
+            ProgressValue = 100;
+        }
+    }
+    public async Task CancelBuilding(int Id, string Type)
+    {
+
+        await BuildingService.CancelBuilding(Id, Type);
+        StateHasChanged();
+    }
+
+    public void StartCountdown()
+    {
+        Timer.Elapsed += (obj, args) =>
+        {
+            if (Untill < 0)
+            {
+                Timer.Stop();
+            }
+            else
+            {
+                var temp = TimeSpan.FromSeconds(Untill);
+                if (temp.TotalDays > 1)
+                {
+                    Text = Math.Floor(temp.TotalDays) + "D " + temp.ToString("hh\\:mm\\:ss");
+                }
+                else
+                {
+                    Text = temp.ToString("hh\\:mm\\:ss");
+                }
+                Untill--;
+                var superduperrownaniezpainta = UserBuildings.BuildFinishTime.Subtract(UserBuildings.BuildStartTime); // 1:10 = 70min
+                var ileuplynelo = DateTime.Now.Subtract(UserBuildings.BuildStartTime); // 10min
+                var rownanie = Math.Floor((ileuplynelo.TotalSeconds / superduperrownaniezpainta.TotalSeconds) * 100); // 10 / 70 = 0.14
+                ProgressValue = Convert.ToInt32(rownanie); // 0.14*100
+                StateHasChanged();
+            }
+        };
+        Timer.Start();
+    }
+
+    public void Dispose()
+    {
+        Timer.Dispose();
+    }
+
+    public async Task FinishBuilding(int Id, string type)
+    {
+        await BuildingService.FinishBuilding(Id, type);
+    }
+}

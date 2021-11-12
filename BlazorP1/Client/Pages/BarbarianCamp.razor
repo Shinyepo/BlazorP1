@@ -1,0 +1,46 @@
+﻿@page "/barbariancamp"
+@inject IBattleService BattleService
+@inject IToastService ToastService
+@inject IBananaService BananaService
+@inject NavigationManager NavManager
+<h1>Missions</h1>
+<h5>Here you can earn easy Bananas or few broken bones! Please keep in mind that you gain 0 Bananas if you lose!</h5>
+<br />
+<h3>Easy Mission<small class="text-muted"> - 130 Bananas </small></h3>
+<button class="btn btn-success" @onclick="() => StartMission(StaticDetails.MissionEasy)">Start Easy</button>
+<br />
+<br />
+<h3>Medium Mission<small class="text-muted"> - 390 Bananas </small></h3>
+<button class="btn btn-primary" @onclick="() => StartMission(StaticDetails.MissionMedium)">Start Medium</button>
+<br />
+<br />
+<h3>Hard Mission<small class="text-muted"> - 910 Bananas </small></h3>
+<button class="btn btn-warning" @onclick="() => StartMission(StaticDetails.MissionHard)">Start Hard</button>
+<br />
+<br />
+<h3>Impossible Mission<small class="text-muted"> - 1690 Bananas </small></h3>
+<button class="btn btn-danger" @onclick="() => StartMission(StaticDetails.MissionImpossible)">Start Impossible</button>
+
+@code {
+    public async Task StartMission(string MissionLevel)
+    {
+
+        var result = await BattleService.StartMission(MissionLevel);
+
+        if (result.RoundsFought <= 0)
+        {
+            ToastService.ShowInfo("Something went wrong :(");
+        }
+        else if (result.IsVictory)
+        {
+            ToastService.ShowSuccess("You won the battle!");
+        }
+        else
+        {
+            ToastService.ShowError("You lost the battle!");
+        }
+        await BananaService.GetBananas();
+
+        if (result.RoundsFought > 0) NavManager.NavigateTo("battlelog");
+    }
+}
