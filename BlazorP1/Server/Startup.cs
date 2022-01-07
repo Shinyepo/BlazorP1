@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Linq;
 
 namespace BlazorP1.Server
@@ -28,10 +29,13 @@ namespace BlazorP1.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DataContext>(o =>
-                o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            services.AddDbContext<DataContext>(o => 
+                o.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+           
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddScoped<IDbInitializer, DbInitializer>();
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IUtilityService, UtilityService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -49,7 +53,7 @@ namespace BlazorP1.Server
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDbInitializer dbInit)
         {
             if (env.IsDevelopment())
             {
@@ -62,6 +66,9 @@ namespace BlazorP1.Server
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            dbInit.Initialize().GetAwaiter();
+            
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();

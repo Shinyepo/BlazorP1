@@ -129,6 +129,10 @@ namespace BlazorP1.Server.Controllers
             var user = await _UtilityService.GetUser();
             var leaderboard = await CreateLeaderboardListAsync();
             var rank = leaderboard.FirstOrDefault(x => x.UserId == user.Id);
+            if (rank == null)
+            {
+                return Ok(0);
+            }
             return Ok(rank.Rank);
 
         }

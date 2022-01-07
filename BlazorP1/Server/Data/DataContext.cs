@@ -16,6 +16,7 @@ namespace BlazorP1.Server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            
             modelBuilder.Entity<Battle>()
                 .HasOne(x => x.Attacker)
                 .WithMany()
