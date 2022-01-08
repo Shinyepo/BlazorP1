@@ -11,7 +11,10 @@ namespace BlazorP1.Server.Data
     {
         Task<ServiceResponse<int>> Register(User user, string password, int startUnitId);
         Task<ServiceResponse<string>> Login(string email, string password);
+
+        Task<ServiceResponse<string>> RequestPasswordChange(string email);
         Task<bool> EmailTaken(string email);
         Task<bool> UsernameTaken(string username);
+        Task<ServiceResponse<string>> ChangePassword(string password, string secret);
     }
 }

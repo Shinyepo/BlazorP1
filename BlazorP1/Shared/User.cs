@@ -22,6 +22,8 @@ namespace BlazorP1.Shared
         public DateTime RegistrationDate { get; set; } = DateTime.Now;
         public DateTime LastLogin { get; set; } = DateTime.Now;
 
+        public string Secret { get; set; }
+
         public List<UserUnit> Units { get; set; }
 
         public int Battles { get; set; }

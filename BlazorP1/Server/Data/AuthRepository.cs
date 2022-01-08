@@ -47,6 +47,39 @@ namespace BlazorP1.Server.Data
             return response;
         }
 
+        public async Task<ServiceResponse<string>> RequestPasswordChange(string email)
+        {
+            var response = new ServiceResponse<string>();
+            response.Message = "If account with provided email exists then we sent password reset link to the email.";
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
+
+            if (user == null)
+            {
+                return response;
+            }
+
+            user.Secret = Guid.NewGuid().ToString();
+            await _context.SaveChangesAsync();
+
+            response.Success = true;
+
+            return response;
+
+        }
+
+        public async Task<ServiceResponse<string>> ChangePassword(string password, string secret)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Secret == secret);
+            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.Secret = null;
+            await _context.SaveChangesAsync();
+
+            return new ServiceResponse<string> { Success = true, Message = "Successfuly changed password" };
+        }
+
         public async Task<ServiceResponse<int>> Register(User user, string password, int startUnitId)
         {
             if (await EmailTaken(user.Email)) return new ServiceResponse<int> { Success = false, Message = "User already Exists."};

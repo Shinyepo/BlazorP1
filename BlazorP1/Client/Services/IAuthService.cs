@@ -10,5 +10,7 @@ namespace BlazorP1.Client.Services
     {
         Task<ServiceResponse<int>> Register(UserRegister request);
         Task<ServiceResponse<string>> Login(UserLogin request);
+        Task<ServiceResponse<string>> RequestPasswordChange(string email);
+        Task<ServiceResponse<string>> ChangePassword(PasswordChangeForm request);
     }
 }

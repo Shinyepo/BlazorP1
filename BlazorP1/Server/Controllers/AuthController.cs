@@ -49,5 +49,29 @@ namespace BlazorP1.Server.Controllers
             }
             return Ok(response);
         }
+
+        [HttpPost("RequestPasswordChange")]
+        public async Task<IActionResult> ChangePassword([FromBody]string email)
+        {
+            var response = await _authRepo.RequestPasswordChange(email);
+
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
+        [HttpPost("ChangePassword")]
+        public async Task<IActionResult> ChangePassword(PasswordChangeForm request)
+        {
+            var response = await _authRepo.ChangePassword(request.Password, request.Secret);
+
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
     }
 }

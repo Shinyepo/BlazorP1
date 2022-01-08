@@ -30,5 +30,19 @@ namespace BlazorP1.Client.Services
             return await result.Content.ReadFromJsonAsync<ServiceResponse<string>>();
         }
 
+        public async Task<ServiceResponse<string>> ChangePassword(PasswordChangeForm request)
+        {
+            var result = await _httpclient.PostAsJsonAsync("api/auth/changepassword", request);
+
+            return await result.Content.ReadFromJsonAsync<ServiceResponse<string>>();
+        }
+
+        public async Task<ServiceResponse<string>> RequestPasswordChange(string email)
+        {
+            var result = await _httpclient.PostAsJsonAsync("api/auth/requestpasswordchange", email);
+            
+            return await result.Content.ReadFromJsonAsync<ServiceResponse<string>>();
+        }
+
     }
 }
