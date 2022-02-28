@@ -1,5 +1,6 @@
 ﻿using BlazorP1.Server.Services;
 using BlazorP1.Shared;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -20,12 +22,14 @@ namespace BlazorP1.Server.Data
 
         private IConfiguration _Config { get; }
         private readonly IUtilityService _UtilityService;
+        public IEmailSender _emailSender { get; set; }
 
-        public AuthRepository(DataContext context, IConfiguration config, IUtilityService utilityService)
+        public AuthRepository(DataContext context, IConfiguration config, IUtilityService utilityService, IEmailSender em)
         {
             _context = context;
             _Config = config;
             _UtilityService = utilityService;
+            _emailSender = em;
         }
         public async Task<ServiceResponse<string>> Login(string email, string password)
         {
@@ -50,7 +54,7 @@ namespace BlazorP1.Server.Data
         public async Task<ServiceResponse<string>> RequestPasswordChange(string email)
         {
             var response = new ServiceResponse<string>();
-            response.Message = "If account with provided email exists then we sent password reset link to the email.";
+            response.Message = "We sent a password reset request link to your email if the account exists.";
 
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
 
@@ -61,7 +65,8 @@ namespace BlazorP1.Server.Data
 
             user.Secret = Guid.NewGuid().ToString();
             await _context.SaveChangesAsync();
-
+            var content = "Here is your password reset request link : https://monkeyfights.shinyepo.dev/forgotpassword?Secret=" + user.Secret+"\n\n Ignore this message if you didnt request a password reset.";
+            _emailSender.SendEmailAsync(email, "Password reset request - Do not reply - Monkey fights", content);
             response.Success = true;
 
             return response;
@@ -87,6 +92,7 @@ namespace BlazorP1.Server.Data
             CreatePasswordHash(password,out byte[] passwordHash, out byte[] passwordSalt);
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
+            user.isConfirmed = true;
             _context.Users.Add(user);
 
             await _context.SaveChangesAsync();

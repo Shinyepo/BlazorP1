@@ -1,3 +1,6 @@
 BlazorP1/**/bin/
 BlazorP1/**/obj/
+BlazorP1/**/Properties/PublishProfiles/
 .vs
+obj/
+bin/

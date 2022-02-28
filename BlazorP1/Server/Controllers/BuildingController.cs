@@ -44,7 +44,7 @@ namespace BlazorP1.Server.Controllers
         public async Task<IActionResult> GetReady()
         {
             var user = await _utilityService.GetUser();
-            var response = _context.UserBuildings.Where(x => !x.isFinished && x.BuildFinishTime < DateTime.Now && x.UserId == user.Id).Count();
+            var response = _context.UserBuildings.Where(x => !x.isFinished && x.BuildFinishTime < DateTime.UtcNow && x.UserId == user.Id).Count();
             return Ok(response);
         }
 
@@ -68,7 +68,7 @@ namespace BlazorP1.Server.Controllers
                         TaskType = StaticDetails.ProductionBuilding,
                         UserBuildingId = Building.Id,
                         UserId = User.Id,
-                        TaskEndTime = DateTime.Now.AddMinutes(TaskTime)
+                        TaskEndTime = DateTime.UtcNow.AddMinutes(TaskTime)
                     };
                     _context.UserBuildingTasks.Add(NewTask);
                     await _context.SaveChangesAsync();
@@ -76,7 +76,7 @@ namespace BlazorP1.Server.Controllers
                 else
                 {
                     FarmTask.LastTaskEndTime = FarmTask.TaskEndTime;
-                    FarmTask.TaskEndTime = DateTime.Now.AddMinutes(TaskTime);
+                    FarmTask.TaskEndTime = DateTime.UtcNow.AddMinutes(TaskTime);
                     await _context.SaveChangesAsync();
                 }
             }
@@ -117,7 +117,7 @@ namespace BlazorP1.Server.Controllers
                     return Ok($"Canceled.");
                 }
                 Building.isFinished = true;
-                Building.BuildFinishTime = DateTime.Now;
+                Building.BuildFinishTime = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
                 return Ok($"Canceled.");
             }
@@ -162,8 +162,8 @@ namespace BlazorP1.Server.Controllers
                     BuildingId = BuildingConfig.Id,
                     BuildingType = BuildingType,
                     UserId = user.Id,
-                    BuildStartTime = DateTime.Now,
-                    BuildFinishTime = DateTime.Now.AddMinutes(BuildingConfig.BuildTimeBase + BuildingConfig.BuildTimeStep)
+                    BuildStartTime = DateTime.UtcNow,
+                    BuildFinishTime = DateTime.UtcNow.AddMinutes(BuildingConfig.BuildTimeBase + BuildingConfig.BuildTimeStep)
                 };
                 _context.UserBuildings.Add(UserBulding);
                 user.Bananas -= cost;
@@ -177,8 +177,8 @@ namespace BlazorP1.Server.Controllers
                 //upgrade building
                 if (UserBulding.isFinished == false) return false;
                 UserBulding.isFinished = false;
-                UserBulding.BuildStartTime = DateTime.Now;
-                UserBulding.BuildFinishTime = DateTime.Now.AddMinutes(BuildingConfig.BuildTimeBase + (BuildingConfig.BuildTimeStep * UserBulding.BuildingLevel));
+                UserBulding.BuildStartTime = DateTime.UtcNow;
+                UserBulding.BuildFinishTime = DateTime.UtcNow.AddMinutes(BuildingConfig.BuildTimeBase + (BuildingConfig.BuildTimeStep * UserBulding.BuildingLevel));
                 user.Bananas -= cost;
                 await _context.SaveChangesAsync();
 
@@ -199,11 +199,11 @@ namespace BlazorP1.Server.Controllers
             var UserBuilding = await _context.UserBuildings.FirstOrDefaultAsync(x => x.UserId == User.Id && x.BuildingId == request.BuildingId && x.BuildingType == request.BuildingType);
             var UserTask = await _context.UserBuildingTasks.FirstOrDefaultAsync(x => x.UserBuildingId == UserBuilding.Id && x.UserId == User.Id && x.TaskType == request.BuildingType);
 
-            if (UserTask.TaskEndTime < DateTime.Now)
+            if (UserTask.TaskEndTime < DateTime.UtcNow)
             {
                 var TaskTime = config.TaskTimeBase + (config.TaskTimeStep * UserBuilding.BuildingLevel);
-                UserTask.LastTaskEndTime = DateTime.Now;
-                UserTask.TaskEndTime = DateTime.Now.AddMinutes(TaskTime);
+                UserTask.LastTaskEndTime = DateTime.UtcNow;
+                UserTask.TaskEndTime = DateTime.UtcNow.AddMinutes(TaskTime);
                 var Amount = config.BananaCountBase + (config.BananaCountStep * UserBuilding.BuildingLevel);
                 User.Bananas += Amount;
                 await _context.SaveChangesAsync();
@@ -212,14 +212,14 @@ namespace BlazorP1.Server.Controllers
             else
             {
                 var TaskTime = config.TaskTimeBase + (config.TaskTimeStep * UserBuilding.BuildingLevel);
-                var MinutesPassed = DateTime.Now.Subtract(UserTask.LastTaskEndTime).TotalMinutes;
+                var MinutesPassed = DateTime.UtcNow.Subtract(UserTask.LastTaskEndTime).TotalMinutes;
                 var maxTime = config.TaskTimeBase + (config.TaskTimeStep * UserBuilding.BuildingLevel);
                 var maxBananas = config.BananaCountBase + (config.BananaCountStep * UserBuilding.BuildingLevel);
                 var Percent = MinutesPassed / maxTime;
                 var Amount = Convert.ToInt32(Math.Floor(maxBananas * Percent));
 
-                UserTask.LastTaskEndTime = DateTime.Now;
-                UserTask.TaskEndTime = DateTime.Now.AddMinutes(TaskTime);
+                UserTask.LastTaskEndTime = DateTime.UtcNow;
+                UserTask.TaskEndTime = DateTime.UtcNow.AddMinutes(TaskTime);
 
                 User.Bananas += Amount;
                 await _context.SaveChangesAsync();

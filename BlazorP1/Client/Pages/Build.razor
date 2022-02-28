@@ -48,7 +48,7 @@
                                         <img src="icons/knight.png" class="d-block" style="margin:auto;" />
 
                                     }
-                                    else if (item.BuildingName == "Archers Guild")
+                                    else if (item.BuildingName == "Archery Range")
                                     {
                                         <img src="icons/archer.png" class="d-block" style="margin:auto;" />
 
@@ -102,7 +102,7 @@
                                             }
                                             else
                                             {
-                                                <span>@(TimeSpan.FromMinutes(item.BuildTimeBase+(item.BuildTimeStep*level)))</span>
+                                                <span>@(TimeSpan.FromMinutes(item.BuildTimeBase+(item.BuildTimeStep*(level+1))))</span>
                                             }
                                         </div>
                                     </div>
@@ -221,7 +221,7 @@
                                             }
                                             else
                                             {
-                                                <span>@(TimeSpan.FromMinutes(item.BuildTimeBase+(item.BuildTimeStep*level)))</span>
+                                                <span>@(TimeSpan.FromMinutes(item.BuildTimeBase+(item.BuildTimeStep*(level+1))))</span>
                                             }
                                         </div>
                                     </div>
@@ -324,7 +324,7 @@
                                             }
                                             else
                                             {
-                                                <span>@(TimeSpan.FromMinutes(item.BuildTimeBase+(item.BuildTimeStep*level)))</span>
+                                                <span>@(TimeSpan.FromMinutes(item.BuildTimeBase+(item.BuildTimeStep*(level+1))))</span>
                                             }
                                         </div>
                                     </div>

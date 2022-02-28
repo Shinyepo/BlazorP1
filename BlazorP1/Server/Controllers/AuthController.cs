@@ -51,7 +51,7 @@ namespace BlazorP1.Server.Controllers
         }
 
         [HttpPost("RequestPasswordChange")]
-        public async Task<IActionResult> ChangePassword([FromBody]string email)
+        public async Task<IActionResult> RequestPasswordChange([FromBody]string email)
         {
             var response = await _authRepo.RequestPasswordChange(email);
 

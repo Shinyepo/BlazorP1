@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorP1.Client", "BlazorP1
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorP1.Shared", "BlazorP1\Shared\BlazorP1.Shared.csproj", "{55795F10-D8E1-439D-B088-67B00E9AFEBB}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{F66B2A6E-DB9D-4739-A332-2E32FCA341AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{55795F10-D8E1-439D-B088-67B00E9AFEBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55795F10-D8E1-439D-B088-67B00E9AFEBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55795F10-D8E1-439D-B088-67B00E9AFEBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F66B2A6E-DB9D-4739-A332-2E32FCA341AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F66B2A6E-DB9D-4739-A332-2E32FCA341AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F66B2A6E-DB9D-4739-A332-2E32FCA341AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F66B2A6E-DB9D-4739-A332-2E32FCA341AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

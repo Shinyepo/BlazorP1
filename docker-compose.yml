@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  blazorp1.server:
+    image: monkeyfights
+    platform: linux/arm64/v8
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    build:
+      context: .
+      dockerfile: BlazorP1/Server/Dockerfile

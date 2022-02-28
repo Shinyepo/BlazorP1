@@ -1,4 +1,4 @@
-﻿@inject IBuildingService BuildingService
+﻿    @inject IBuildingService BuildingService
 @using System.Timers;
 @implements IDisposable
 
@@ -81,9 +81,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (UserBuildings.BuildFinishTime > DateTime.Now)
+
+        if (UserBuildings.BuildFinishTime > DateTime.UtcNow)
         {
-            Untill = Convert.ToInt32(UserBuildings.BuildFinishTime.Subtract(DateTime.Now).TotalSeconds);
+            Untill = Convert.ToInt32(UserBuildings.BuildFinishTime.Subtract(DateTime.UtcNow).TotalSeconds);
             StartCountdown();
         } else
         {
@@ -119,7 +120,7 @@
                 }
                 Untill--;
                 var superduperrownaniezpainta = UserBuildings.BuildFinishTime.Subtract(UserBuildings.BuildStartTime); // 1:10 = 70min
-                var ileuplynelo = DateTime.Now.Subtract(UserBuildings.BuildStartTime); // 10min
+                var ileuplynelo = DateTime.UtcNow.Subtract(UserBuildings.BuildStartTime); // 10min
                 var rownanie = Math.Floor((ileuplynelo.TotalSeconds / superduperrownaniezpainta.TotalSeconds) * 100); // 10 / 70 = 0.14
                 ProgressValue = Convert.ToInt32(rownanie); // 0.14*100
                 StateHasChanged();

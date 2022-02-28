@@ -36,7 +36,7 @@
                             URCount += UnitsReadyCount;
                             UICount += UnitsInjuredCount;
                             <tr>
-                                <td><img src="icons/@(item.Title).png" alt="Units Emblem" /></td>
+                                <td><img src="icons/@(item.Title.ToLower()).png" alt="Units Emblem" /></td>
                                 <td>@UnitsCount</td>
                                 <td>@UnitsReadyCount</td>
                                 <td>@UnitsInjuredCount</td>
@@ -76,7 +76,7 @@
             @foreach (var item in UnitService.MyUnits)
             {
                 <tr>
-                    <td><img src="icons/@(item.Unit.Title).png" alt="Units Emblem" /></td>
+                    <td><img src="icons/@(item.Unit.Title.ToLower()).png" alt="Units Emblem" /></td>
                     <td class="d-none d-sm-table-cell">@item.Unit.Title</td>
                     <td>@item.HitPoints</td>
                     <td>@item.Unit.Attack</td>

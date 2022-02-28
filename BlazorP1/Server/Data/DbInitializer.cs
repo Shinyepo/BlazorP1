@@ -273,8 +273,7 @@ namespace BlazorP1.Server.Data
                 
 
             }
-                var result = _db.SaveChangesAsync().Result;
-                var s = 1;
+                _db.SaveChangesAsync().GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
