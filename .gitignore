@@ -4,3 +4,5 @@ BlazorP1/**/Properties/PublishProfiles/
 .vs
 obj/
 bin/
+BlazorP1/Server/Services/EmailSender.cs
+BlazorP1/Server/appsettings.json
