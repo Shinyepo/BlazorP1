@@ -68,7 +68,8 @@ namespace BlazorP1.Server.Controllers
                         TaskType = StaticDetails.ProductionBuilding,
                         UserBuildingId = Building.Id,
                         UserId = User.Id,
-                        TaskEndTime = DateTime.UtcNow.AddMinutes(TaskTime)
+                        TaskEndTime = DateTime.UtcNow.AddMinutes(TaskTime),
+                        LastTaskEndTime = DateTime.UtcNow.AddMinutes(TaskTime)
                     };
                     _context.UserBuildingTasks.Add(NewTask);
                     await _context.SaveChangesAsync();

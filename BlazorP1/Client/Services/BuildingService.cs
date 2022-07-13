@@ -50,7 +50,7 @@ namespace BlazorP1.Client.Services
             }
             else
             {
-                _tService.ShowError(response);
+                _tService.ShowError("Something went wrong :(");
             }
 
         }
@@ -137,7 +137,7 @@ namespace BlazorP1.Client.Services
             }
             else
             {
-                _tService.ShowError(response);
+                _tService.ShowError("Something went wrong :(");
             }
         }
 
