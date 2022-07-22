@@ -15,7 +15,7 @@ namespace BlazorP1.Server.Services
 
         public EmailSender(IOptions<EmailOptions> eo, DataContext context)
         {
-            SendGridKey = Environment.GetEnvironmentVariable("SENDGRID_KEY");
+            SendGridKey = System.Environment.GetEnvironmentVariable("SENDGRID_KEY");
            _context = context;
         }
         public Task SendEmailAsync(string email, string subject, string message)
