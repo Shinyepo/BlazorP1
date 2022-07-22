@@ -12,7 +12,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Npgsql;
 using System;
 using System.Linq;
 
@@ -32,24 +31,8 @@ namespace BlazorP1.Server
         public void ConfigureServices(IServiceCollection services)
         {
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-            // postgres://leclbiltkorfkz:e784defc1fc66f9519242073b49ff30ff93d4f9e74bada384dee357983b0dc4b@ec2-54-76-43-89.eu-west-1.compute.amazonaws.com:5432/d98gg5dk7rka1c
-            var env = Environment.GetEnvironmentVariable("DATABASE_URL");
-            //postgres://1user:1password@dbserver.com:4568/testdb
-            var raw = env.Split("/");
-
-
-            var builder = new NpgsqlConnectionStringBuilder
-            {
-                Host = raw[1].Split("@")[1].Split(":")[0],
-                Username = raw[1].Split(":")[0],
-                Password = raw[1].Split(":")[1].Split("@")[0],
-                Port = Convert.ToInt32(raw[1].Split(":")[2]),
-                Database = raw[2]
-            };
-            
-
             services.AddDbContext<DataContext>(o => 
-                o.UseNpgsql(builder.ToString()));
+                o.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_URL")));
 
             services.Configure<EmailOptions>(Configuration);
             services.AddScoped<IEmailSender, EmailSender>();
