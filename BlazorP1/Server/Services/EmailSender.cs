@@ -15,7 +15,7 @@ namespace BlazorP1.Server.Services
 
         public EmailSender(IOptions<EmailOptions> eo, DataContext context)
         {
-            SendGridKey = eo.Value.SendGridKey;
+            SendGridKey = Environment.GetEnvironmentVariable("SENDGRID_KEY");
            _context = context;
         }
         public Task SendEmailAsync(string email, string subject, string message)
@@ -26,7 +26,7 @@ namespace BlazorP1.Server.Services
         private async Task<bool> Execute(string sendGridKey, string email, string subject, string message)
         {
             var client = new SendGridClient(sendGridKey);
-            var from = new EmailAddress("-", "Monkey Fights");
+            var from = new EmailAddress("monkeyfightsthegame@gmail.com", "Monkey Fights");
             var user = _context.Users.FirstOrDefault(x => x.Email.ToLower() == email.ToLower());
             if (user == null) return false;
             var to = new EmailAddress(email, user.Username);

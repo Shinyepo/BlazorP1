@@ -32,7 +32,7 @@ namespace BlazorP1.Server
         {
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             services.AddDbContext<DataContext>(o => 
-                o.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+                o.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_URL")));
 
             services.Configure<EmailOptions>(Configuration);
             services.AddScoped<IEmailSender, EmailSender>();
@@ -48,7 +48,7 @@ namespace BlazorP1.Server
                     o.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(Configuration.GetSection("Appsettings:Token").Value)),
+                        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("TOKEN"))),
                         ValidateIssuer = false,
                         ValidateAudience = false
                     };
