@@ -32,9 +32,7 @@ namespace BlazorP1.Server
         public void ConfigureServices(IServiceCollection services)
         {
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-            // postgres://leclbiltkorfkz:e784defc1fc66f9519242073b49ff30ff93d4f9e74bada384dee357983b0dc4b@ec2-54-76-43-89.eu-west-1.compute.amazonaws.com:5432/d98gg5dk7rka1c
             var env = Environment.GetEnvironmentVariable("DATABASE_URL");
-            //postgres://1user:1password@dbserver.com:4568/testdb
             var raw = env.Split("/");
 
 
