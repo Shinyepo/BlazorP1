@@ -38,11 +38,11 @@ namespace BlazorP1.Server
 
             var builder = new NpgsqlConnectionStringBuilder
             {
-                Host = raw[1].Split("@")[1].Split(":")[0],
-                Username = raw[1].Split(":")[0],
-                Password = raw[1].Split(":")[1].Split("@")[0],
-                Port = Convert.ToInt32(raw[1].Split(":")[2]),
-                Database = raw[2]
+                Host = raw[2].Split("@")[1].Split(":")[0],
+                Username = raw[2].Split(":")[0],
+                Password = raw[2].Split(":")[1].Split("@")[0],
+                Port = Convert.ToInt32(raw[2].Split(":")[2]),
+                Database = raw[3]
             };
             
 
