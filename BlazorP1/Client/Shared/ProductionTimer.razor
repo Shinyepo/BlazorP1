@@ -58,7 +58,7 @@
                 var maxBananas = Config.BananaCountBase + (Config.BananaCountStep * UserBuildings.BuildingLevel);
                 var Percent = MinutesPassed / maxTime;
                 var Amount = Convert.ToInt32(Math.Floor(maxBananas * Percent));
-                Console.WriteLine("Amount " + Amount);
+                Text = Amount.ToString();
                 StateHasChanged();
             }
         };

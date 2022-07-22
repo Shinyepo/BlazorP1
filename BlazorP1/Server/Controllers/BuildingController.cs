@@ -206,6 +206,7 @@ namespace BlazorP1.Server.Controllers
                 UserTask.LastTaskEndTime = DateTime.UtcNow;
                 UserTask.TaskEndTime = DateTime.UtcNow.AddMinutes(TaskTime);
                 var Amount = config.BananaCountBase + (config.BananaCountStep * UserBuilding.BuildingLevel);
+                Amount = Amount > 0 ? Amount : 0;
                 User.Bananas += Amount;
                 await _context.SaveChangesAsync();
                 return Ok($"Collected {Amount} Bananas!");
@@ -221,6 +222,7 @@ namespace BlazorP1.Server.Controllers
 
                 UserTask.LastTaskEndTime = DateTime.UtcNow;
                 UserTask.TaskEndTime = DateTime.UtcNow.AddMinutes(TaskTime);
+                Amount = Amount > 0 ? Amount : 0;
 
                 User.Bananas += Amount;
                 await _context.SaveChangesAsync();
