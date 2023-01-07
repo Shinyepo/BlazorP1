@@ -277,7 +277,7 @@ namespace BlazorP1.Server.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error " + ex);
+                Console.WriteLine("Error while initializing DB");
             }
 
         }

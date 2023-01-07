@@ -19,20 +19,22 @@ namespace BlazorP1.Server.Services
            _context = context;
         }
         public Task SendEmailAsync(string email, string subject, string message)
-        {
+        {            
             return Execute(SendGridKey, email, subject, message);
         }
 
         private async Task<bool> Execute(string sendGridKey, string email, string subject, string message)
         {
-            var client = new SendGridClient(sendGridKey);
+            return false;
+
+            /*var client = new SendGridClient(sendGridKey);
             var from = new EmailAddress("monkeyfightsthegame@gmail.com", "Monkey Fights");
             var user = _context.Users.FirstOrDefault(x => x.Email.ToLower() == email.ToLower());
             if (user == null) return false;
             var to = new EmailAddress(email, user.Username);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, message, "");
             var response = await client.SendEmailAsync(msg);
-            return true;
+            return true;*/
 
         }
     }

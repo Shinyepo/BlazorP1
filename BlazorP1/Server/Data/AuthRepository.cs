@@ -54,7 +54,12 @@ namespace BlazorP1.Server.Data
         public async Task<ServiceResponse<string>> RequestPasswordChange(string email)
         {
             var response = new ServiceResponse<string>();
-            response.Message = "We sent a password reset request link to your email if the account exists.";
+            response.Message = "This feature is currently disabled";
+            response.Success = false;
+
+            return response;
+
+            /*response.Message = "We sent a password reset request link to your email if the account exists.";
 
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
 
@@ -69,7 +74,7 @@ namespace BlazorP1.Server.Data
             _emailSender.SendEmailAsync(email, "Password reset request - Do not reply - Monkey fights", content);
             response.Success = true;
 
-            return response;
+            return response;*/
 
         }
 
